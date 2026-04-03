@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { App as CapacitorApp } from '@capacitor/app';
+import { StatusBar } from '@capacitor/status-bar';
+import { Capacitor } from '@capacitor/core';
 import Home from './pages/Home.tsx';
 import Movies from './pages/Movies.tsx';
-import TVShows from './pages/TVShows.tsx';
 import Login from './pages/Login.tsx';
 import SignUp from './pages/SignUp.tsx';
 import Profiles from './pages/Profiles.tsx';
@@ -15,10 +16,10 @@ import Trending from './pages/Trending.tsx';
 import SplashScreen from './components/SplashScreen.tsx';
 import BottomNav from './components/BottomNav.tsx';
 import Navbar from './components/Navbar.tsx';
+import MobileHeader from './components/MobileHeader.tsx';
 import { MovieProvider } from './context/MovieContext.tsx';
 import { AuthProvider } from './context/AuthContext.tsx';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
-import VideoPlayer from './components/VideoPlayer.tsx';
 
 // Internal component to handle hardware back button
 const BackButtonHandler = () => {
@@ -26,7 +27,7 @@ const BackButtonHandler = () => {
     const location = useLocation();
 
     useEffect(() => {
-        const handler = CapacitorApp.addListener('backButton', ({ canGoBack }) => {
+        const handler = CapacitorApp.addListener('backButton', ({ canGoBack }: { canGoBack: boolean }) => {
             if (location.pathname === '/' || location.pathname === '/login') {
                 // Exit app if on Home or Login
                 CapacitorApp.exitApp();
@@ -40,26 +41,72 @@ const BackButtonHandler = () => {
         });
 
         return () => {
-            handler.then(h => h.remove());
+            handler.then(h => { if (h) h.remove(); });
         };
     }, [navigate, location]);
 
     return null;
 };
 
+// Internal component to handle persistent immersive mode
+const StatusBarHandler = () => {
+    const location = useLocation();
+
+    useEffect(() => {
+        const hideStatus = async () => {
+            if (Capacitor.isNativePlatform()) {
+                try {
+                    await StatusBar.hide();
+                    // Just in case it's visible, ensure it's black
+                    await StatusBar.setBackgroundColor({ color: '#000000' });
+                    await StatusBar.setStyle({ style: 'DARK' as any }); // 'DARK' = dark content on light bg, 'LIGHT' = light content on dark bg. Capacitor 5/6 uses 'Dark' and 'Light'. Actually it depends on the version. Let's use 'DARK' (white text) for black bg.
+                } catch (e) {
+                    console.warn('Status bar hide failed:', e);
+                }
+            }
+        };
+        hideStatus();
+    }, [location]);
+
+    return null;
+};
+
 const App: React.FC = () => {
-    const [showSplash, setShowSplash] = useState(true);
+    const [showSplash, setShowSplash] = React.useState(() => {
+        return !sessionStorage.getItem('filamu_splash_shown');
+    });
+
+    useEffect(() => {
+        if (showSplash) {
+            sessionStorage.setItem('filamu_splash_shown', 'true');
+        }
+        
+        // Global Immersive Mode (Fullscreen)
+        const hideSystemUI = async () => {
+            if (Capacitor.isNativePlatform()) {
+                try {
+                    await StatusBar.hide();
+                } catch (e) {
+                    console.warn('Status bar hide failed:', e);
+                }
+            }
+        };
+        
+        hideSystemUI();
+    }, [showSplash]);
 
     return (
         <AuthProvider>
             <MovieProvider>
                 {showSplash ? (
-                    <SplashScreen onFinish={() => setShowSplash(false)} />
+                   <SplashScreen onFinish={() => setShowSplash(false)} />
                 ) : (
-                    <Router>
+                   <Router>
                         <BackButtonHandler />
+                        <StatusBarHandler />
                         <Navbar />
-                        <div className="flex flex-col min-h-screen">
+                        <MobileHeader />
+                        <div className="flex flex-col min-h-screen border-t-[0px] border-transparent pt-0">
                             <main className="flex-grow">
                                 <Routes>
                                     <Route path="/login" element={<Login />} />
@@ -68,7 +115,6 @@ const App: React.FC = () => {
                                     {/* Protected Routes */}
                                     <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
                                     <Route path="/movies" element={<ProtectedRoute><Movies /></ProtectedRoute>} />
-                                    <Route path="/tvshows" element={<ProtectedRoute><TVShows /></ProtectedRoute>} />
                                     <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
                                     <Route path="/profiles" element={<ProtectedRoute><Profiles /></ProtectedRoute>} />
                                     <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
@@ -83,9 +129,8 @@ const App: React.FC = () => {
                             </main>
                             <BottomNav />
                         </div>
-                        <VideoPlayer />
                     </Router>
-                )}
+                 )}
             </MovieProvider>
         </AuthProvider>
     );

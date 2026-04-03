@@ -23,15 +23,15 @@ const Trending: React.FC = () => {
                 animate={{ opacity: 1, x: 0 }}
                 className="flex items-center gap-3 mb-2"
             >
-                <Sparkles className="w-5 h-5 text-[#E50914]" />
-                <span className="text-[#E50914] text-[10px] font-black uppercase tracking-[0.5em]">The Heat Map</span>
+                <Sparkles className="w-5 h-5 text-primary" />
+                <span className="text-primary text-[10px] font-black uppercase tracking-[0.5em]">The Heat Map</span>
             </motion.div>
             <motion.h1 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="text-white text-5xl md:text-7xl font-black tracking-tighter uppercase"
             >
-                New & <span className="text-[#E50914]">Popular</span>
+                New & <span className="text-primary">Popular</span>
             </motion.h1>
         </header>
 

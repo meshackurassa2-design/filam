@@ -85,8 +85,8 @@ const Navbar: React.FC = () => {
             >
                 <div className="flex items-center gap-3">
                     <div className="flex flex-col">
-                        <span className="text-lg font-black tracking-[0.2em] text-white leading-none group-hover:text-[#DAA520] transition-colors uppercase">Filamu</span>
-                        <span className="text-[8px] font-black tracking-[0.5em] text-[#DAA520] uppercase">Times</span>
+                        <span className="text-lg font-black tracking-[0.2em] text-white leading-none group-hover:text-primary transition-colors uppercase">Filamu</span>
+                        <span className="text-[8px] font-black tracking-[0.5em] text-primary uppercase">Times</span>
                     </div>
                 </div>
             </div>
@@ -102,7 +102,7 @@ const Navbar: React.FC = () => {
                             ${isActive ? 'text-white' : 'text-zinc-500 hover:text-white hover:scale-105'}
                         `}
                     >
-                        <link.icon className={`w-4 h-4 transition-colors ${location.pathname === link.path ? 'text-[#E50914]' : ''}`} />
+                        <link.icon className={`w-4 h-4 transition-colors ${location.pathname === link.path ? 'text-primary' : ''}`} />
                         {link.label}
                     </NavLink>
                 ))}
@@ -112,7 +112,7 @@ const Navbar: React.FC = () => {
                         to="/admin"
                         className={({ isActive }) => `
                             flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] transition-all duration-500
-                            ${isActive ? 'text-white' : 'text-[#E50914]/60 hover:text-[#E50914]'}
+                            ${isActive ? 'text-white' : 'text-primary/60 hover:text-primary'}
                         `}
                     >
                         <LayoutDashboard className="w-4 h-4" />
@@ -138,7 +138,7 @@ const Navbar: React.FC = () => {
                                     placeholder="Search originals..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="bg-white/5 border border-white/10 rounded-full py-2.5 pl-12 pr-10 text-xs text-white focus:outline-none focus:border-[#E50914]/50 w-full font-bold tracking-tight"
+                                    className="bg-white/5 border border-white/10 rounded-full py-2.5 pl-12 pr-10 text-xs text-white focus:outline-none focus:border-primary/50 w-full font-bold tracking-tight"
                                 />
                                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                                 <button 
@@ -164,15 +164,15 @@ const Navbar: React.FC = () => {
                 <div className="hidden sm:flex items-center gap-8">
                     <button className="text-zinc-400 hover:text-white transition-colors relative">
                         <Bell className="w-5 h-5" />
-                        <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[#E50914] rounded-full border-2 border-black" />
+                        <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-primary rounded-full border-2 border-black" />
                     </button>
 
                     <div 
                         onClick={() => navigate('/account')}
                         className="flex items-center gap-3 cursor-pointer group"
                     >
-                        <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/5 border border-white/10 group-hover:border-[#E50914] transition-all relative">
-                            <User className="w-5 h-5 text-zinc-400 group-hover:text-[#E50914]" />
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/5 border border-white/10 group-hover:border-primary transition-all relative">
+                            <User className="w-5 h-5 text-zinc-400 group-hover:text-primary" />
                         </div>
                         <ChevronDown className="w-4 h-4 text-zinc-500 group-hover:text-white transition-colors" />
                     </div>
@@ -180,7 +180,7 @@ const Navbar: React.FC = () => {
 
                 <button 
                     onClick={handleLogout}
-                    className="flex items-center gap-2 p-2 rounded-lg text-zinc-500 hover:text-white transition-all group lg:hidden"
+                    className="flex items-center gap-2 p-2 rounded-lg text-zinc-500 hover:text-primary transition-all group lg:hidden"
                 >
                     <LogOut className="w-5 h-5" />
                 </button>

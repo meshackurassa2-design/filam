@@ -1,6 +1,6 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { Movie } from '../types/movie';
 import MovieCard from './MovieCard';
 
@@ -10,67 +10,36 @@ interface RowProps {
   variant?: 'poster' | 'backdrop';
 }
 
-const Row: React.FC<RowProps> = ({ title, movies, variant = 'backdrop' }) => {
+const Row: React.FC<RowProps> = ({ title, movies, variant = 'poster' }) => {
   const rowRef = useRef<HTMLDivElement>(null);
-  const [showLeft, setShowLeft] = useState(false);
-  const [showRight, setShowRight] = useState(true);
-
-  const handleScroll = () => {
-    if (rowRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = rowRef.current;
-      setShowLeft(scrollLeft > 10);
-      setShowRight(scrollLeft < scrollWidth - clientWidth - 10);
-    }
-  };
-
-  const scroll = (direction: 'left' | 'right') => {
-    if (rowRef.current) {
-      const { clientWidth } = rowRef.current;
-      const scrollAmount = direction === 'left' ? -clientWidth * 0.8 : clientWidth * 0.8;
-      rowRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-    }
-  };
 
   if (movies.length === 0) return null;
 
   return (
-    <div className="relative mb-16 group/row">
-      <div className="flex items-center justify-between mb-6 px-4">
-        <div className="flex items-center gap-4">
-          <div className="w-1.5 h-8 bg-[#E50914] rounded-sm shadow-[0_0_15px_rgba(229,9,20,0.4)]" />
-          <h2 className="text-lg sm:text-xl md:text-2xl font-black tracking-tight text-white uppercase tracking-[0.1em]">
-            {title}
-          </h2>
-        </div>
+    <div className="relative mb-12 group/row font-sans">
+      <div className="flex items-center justify-between mb-5 md:mb-8 px-2">
+        <h2 className="text-lg md:text-2xl font-black uppercase tracking-[0.05em] text-white/95 group-hover:text-primary transition-colors duration-500">
+          {title}
+        </h2>
         
-        <div className="flex items-center gap-3 opacity-0 group-hover/row:opacity-100 transition-opacity duration-500">
-           <button 
-            onClick={() => scroll('left')}
-            className={`p-2 rounded-full glass hover:bg-[#E50914]/20 hover:text-[#E50914] transition-all ${!showLeft ? 'opacity-30 cursor-not-allowed' : 'opacity-100 active:scale-90 border-white/20'}`}
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <button 
-            onClick={() => scroll('right')}
-            className={`p-2 rounded-full glass hover:bg-[#E50914]/20 hover:text-[#E50914] transition-all ${!showRight ? 'opacity-30 cursor-not-allowed' : 'opacity-100 active:scale-90 border-white/20'}`}
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        </div>
+        <button className="flex items-center gap-1.5 text-[9px] md:text-xs font-black text-zinc-600 hover:text-white transition-all uppercase tracking-[0.25em] hover:translate-x-1">
+            See all
+            <Play className="w-2.5 h-2.5 fill-current ml-0.5" />
+        </button>
       </div>
 
       <div 
         ref={rowRef}
-        onScroll={handleScroll}
-        className="flex gap-4 md:gap-5 overflow-x-scroll no-scrollbar py-6 px-4 scroll-smooth"
+        className="flex gap-4 md:gap-5 overflow-x-scroll no-scrollbar pb-6 scroll-smooth snap-x snap-mandatory px-2"
       >
         <AnimatePresence initial={false}>
           {movies.map((movie) => (
-            <MovieCard 
-              key={movie.id} 
-              movie={movie} 
-              variant={variant} 
-            />
+            <div key={movie.id} className="snap-start">
+              <MovieCard 
+                movie={movie} 
+                variant={variant} 
+              />
+            </div>
           ))}
         </AnimatePresence>
       </div>
@@ -79,5 +48,3 @@ const Row: React.FC<RowProps> = ({ title, movies, variant = 'backdrop' }) => {
 };
 
 export default Row;
-
-

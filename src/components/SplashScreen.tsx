@@ -69,14 +69,14 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
                     className="fixed inset-0 z-[10000] bg-black flex flex-col items-center justify-center overflow-hidden"
                 >
                     <div className="absolute inset-0 z-0 overflow-hidden">
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120vw] h-[120vw] bg-[#E50914]/10 rounded-full blur-[180px] animate-pulse" />
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120vw] h-[120vw] bg-primary/10 rounded-full blur-[180px] animate-pulse" />
                         <motion.div 
                             animate={{ 
                                 scale: [1, 1.2, 1],
                                 opacity: [0.1, 0.2, 0.1]
                             }}
                             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] bg-[#E50914]/10 rounded-full blur-[140px]" 
+                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] bg-primary/10 rounded-full blur-[140px]" 
                         />
                     </div>
 
@@ -89,8 +89,8 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
                                         key={i}
                                         variants={letterVariants}
                                         className={`text-6xl md:text-9xl font-black tracking-tighter select-none ${
-                                            ['F', 'I', 'L', 'A', 'M', 'U'].includes(char) ? 'text-[#E50914]' : 'text-white'
-                                        } drop-shadow-[0_0_30px_rgba(229,9,20,0.3)]`}
+                                            ['F', 'I', 'L', 'A', 'M', 'U'].includes(char) ? 'text-primary' : 'text-white'
+                                        } drop-shadow-[0_0_30px_rgba(255,184,0,0.3)]`}
                                     >
                                         {char}
                                     </motion.span>
@@ -103,7 +103,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
                                     initial={{ x: "-100%" }}
                                     animate={{ x: "100%" }}
                                     transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                                    className="absolute inset-0 bg-gradient-to-r from-transparent via-[#E50914] to-transparent shadow-[0_0_15px_#E50914]"
+                                    className="absolute inset-0 bg-gradient-to-r from-transparent via-primary to-transparent shadow-[0_0_15px_#FFB800]"
                                 />
                             </div>
 
@@ -116,8 +116,8 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
                                 <span className="text-gray-500 text-[10px] md:text-xs font-black uppercase tracking-widest text-center">
                                     Original Cinema
                                 </span>
-                                <div className="h-px w-8 bg-[#E50914]/50" />
-                                <span className="text-[#E50914] text-[8px] font-black uppercase tracking-[0.8em]">
+                                <div className="h-px w-8 bg-primary/50" />
+                                <span className="text-primary text-[8px] font-black uppercase tracking-[0.8em]">
                                     Across Africa
                                 </span>
                             </motion.div>

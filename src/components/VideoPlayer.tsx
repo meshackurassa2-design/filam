@@ -12,33 +12,14 @@ import {
   VolumeX, 
   Maximize, 
   Subtitles,
-  Settings,
-  MessageSquare,
-  Star,
-  Send,
   X,
-  Share2,
-  ThumbsUp
+  Share2
 } from 'lucide-react';
 import { useMovies } from '../context/MovieContext';
-import { useAuth } from '../context/AuthContext';
-import { supabase } from '../lib/supabase';
-import maleDefault from '../assets/avatars/male-black-avatar.png';
 import { ScreenOrientation } from '@capacitor/screen-orientation';
 import { Capacitor } from '@capacitor/core';
 import { StatusBar, StatusBarAnimation } from '@capacitor/status-bar';
 
-interface Comment {
-  id: string;
-  content: string;
-  user_id: string;
-  movie_id: string;
-  created_at: string;
-  profiles: {
-    username: string;
-    avatar_url: string;
-  };
-}
 
 interface VideoPlayerProps {
   fullPage?: boolean;
@@ -46,23 +27,19 @@ interface VideoPlayerProps {
 }
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({ fullPage = false, movie: propMovie }) => {
-  const { selectedMovie: contextMovie, setIsPlayerOpen, isPlayerOpen } = useMovies();
+  const { selectedMovie: contextMovie, isPlayerOpen, setIsPlayerOpen } = useMovies();
   const selectedMovie = propMovie || contextMovie;
-  const { user } = useAuth();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [showControls, setShowControls] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(1);
-  const [isMuted, setIsMuted] = useState(true); // Start muted to allow autoplay on web
+  const [isMuted, setIsMuted] = useState(false); // Start unmuted for native experience
   const [isBuffering, setIsBuffering] = useState(true); 
   const [hasError, setHasError] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [showSocial, setShowSocial] = useState(false);
-  const [comment, setComment] = useState('');
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [rating, setRating] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -76,11 +53,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ fullPage = false, movie: prop
   // Handle Cinematic Immersive Mode (Status Bar & Orientation)
   useEffect(() => {
     const enterImmersive = async () => {
-      if (Capacitor.isNativePlatform() && (isPlayerOpen || fullPage)) {
+      if (Capacitor.isNativePlatform() && isFullscreen) {
         try {
-          // Hide System UI for absolute distraction-free playback
           await StatusBar.hide({ animation: StatusBarAnimation.Fade });
-          // Lock Orientation to Landscape for cinematic feel
           await ScreenOrientation.lock({ orientation: 'landscape' });
         } catch (e) {
           console.warn('Immersive mode entry failed:', e);
@@ -91,9 +66,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ fullPage = false, movie: prop
     const exitImmersive = async () => {
       if (Capacitor.isNativePlatform()) {
         try {
-          // Show System UI when exiting player
           await StatusBar.show({ animation: StatusBarAnimation.Fade });
-          // Unlock Orientation to allow portrait use
           await ScreenOrientation.unlock();
         } catch (e) {
           console.warn('Immersive mode exit failed:', e);
@@ -101,7 +74,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ fullPage = false, movie: prop
       }
     };
 
-    if (isPlayerOpen || fullPage) {
+    if (isFullscreen) {
       enterImmersive();
     } else {
       exitImmersive();
@@ -110,7 +83,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ fullPage = false, movie: prop
     return () => {
       exitImmersive();
     };
-  }, [isPlayerOpen, fullPage]);
+  }, [isFullscreen]);
 
   // Robust Autoplay Enforcement
   useEffect(() => {
@@ -138,79 +111,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ fullPage = false, movie: prop
         }
     }
   }, [isPlayerOpen, fullPage, selectedMovie?.id]);
-
-  const fetchComments = React.useCallback(async () => {
-      if (!selectedMovie) return;
-      const { data } = await supabase
-          .from('movie_comments')
-          .select(`
-            *,
-            profiles:user_id (username, avatar_url)
-          `)
-          .eq('movie_id', selectedMovie.id)
-          .order('created_at', { ascending: false });
-      if (data) setComments(data);
-  }, [selectedMovie]);
-
-  const fetchUserRating = React.useCallback(async () => {
-      if (!selectedMovie || !user) return;
-      const { data } = await supabase
-          .from('movie_ratings')
-          .select('rating')
-          .eq('movie_id', selectedMovie.id)
-          .eq('user_id', user.id)
-          .single();
-      if (data) setRating(data.rating);
-  }, [selectedMovie, user]);
-
-  useEffect(() => {
-    let active = true;
-    const loadSocialData = async () => {
-      if (selectedMovie && isPlayerOpen && active) {
-        await fetchComments();
-        await fetchUserRating();
-      }
-    };
-    loadSocialData();
-    return () => { active = false; };
-  }, [selectedMovie, isPlayerOpen, fetchComments, fetchUserRating]);
-
-  const handleRating = async (val: number) => {
-      if (!selectedMovie || !user) return;
-      setRating(val);
-      await supabase
-          .from('movie_ratings')
-          .upsert({
-              movie_id: selectedMovie.id,
-              user_id: user.id,
-              rating: val
-          });
-  };
-
-  const handleComment = async (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!comment.trim() || !selectedMovie || !user) return;
-
-      const newComment = {
-          movie_id: selectedMovie.id,
-          user_id: user.id,
-          content: comment
-      };
-
-      const { data, error } = await supabase
-          .from('movie_comments')
-          .insert(newComment)
-          .select(`
-            *,
-            profiles:user_id (username, avatar_url)
-          `)
-          .single();
-
-      if (!error && data) {
-          setComments([data, ...comments]);
-          setComment('');
-      }
-  };
 
   const togglePlay = () => {
     if (videoRef.current) {
@@ -261,7 +161,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ fullPage = false, movie: prop
   if (!selectedMovie || (!isPlayerOpen && !fullPage)) return null;
 
   const handleClose = () => {
-    if (fullPage) {
+    if (isFullscreen) {
+      setIsFullscreen(false);
+    } else if (fullPage) {
       navigate(-1);
     } else {
       setIsPlayerOpen(false);
@@ -269,32 +171,19 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ fullPage = false, movie: prop
   };
 
   const toggleFullscreen = () => {
-    if (videoRef.current) {
-        const container = videoRef.current.parentElement as HTMLElement & { 
-            webkitRequestFullscreen?: () => Promise<void>;
-        };
-        if (document.fullscreenElement) {
-            document.exitFullscreen();
-        } else {
-            if (container.requestFullscreen) {
-                container.requestFullscreen();
-            } else if (container.webkitRequestFullscreen) {
-                container.webkitRequestFullscreen();
-            }
-        }
-    }
+    setIsFullscreen(!isFullscreen);
   };
 
   return (
     <div 
-      className={`${fullPage ? 'relative w-full aspect-video md:aspect-[21/9] z-10' : 'fixed inset-0 z-[7000]'} bg-black flex items-center justify-center overflow-hidden`}
+      className={`${isFullscreen ? 'fixed inset-0 z-[7000]' : 'relative w-full aspect-video z-10'} bg-black flex items-center justify-center overflow-hidden`}
       onMouseMove={() => setShowControls(true)}
       onClick={() => setShowControls(true)}
     >
       <video 
         ref={videoRef}
         key={selectedMovie.id} 
-        className="w-full h-full object-contain"
+        className="w-full h-full object-cover"
         onPlay={() => { setIsPlaying(true); setIsBuffering(false); }}
         onPause={() => setIsPlaying(false)}
         onWaiting={() => setIsBuffering(true)}
@@ -351,28 +240,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ fullPage = false, movie: prop
         )}
       </AnimatePresence>
 
-      {/* Tap to Unmute Overlay */}
-      <AnimatePresence>
-        {isMuted && isPlaying && !showSocial && (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            className="absolute top-24 left-1/2 -translate-x-1/2 z-30"
-          >
-            <button 
-              onClick={() => {
-                setIsMuted(false);
-                if (videoRef.current) videoRef.current.muted = false;
-              }}
-              className="px-6 py-2 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full text-white text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:bg-white/20 transition-all shadow-2xl"
-            >
-              <VolumeX className="w-4 h-4" />
-              Tap to Unmute
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Muted indicator handled via controls */}
 
       {/* Premium Overlay UI */}
       <AnimatePresence>
@@ -399,17 +267,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ fullPage = false, movie: prop
               </div>
               
               <div className="flex items-center gap-3">
-                 <button 
-                    onClick={() => setShowSocial(!showSocial)}
-                    className={`w-10 h-10 rounded-full glass border border-white/10 flex items-center justify-center transition-all ${showSocial ? 'bg-[#E50914] text-white' : 'text-white/60 hover:text-white'}`}
-                 >
-                    <MessageSquare className="w-5 h-5" />
-                 </button>
                  <button className="hidden md:flex w-10 h-10 rounded-full glass border border-white/10 items-center justify-center text-white/60 hover:text-white transition-all">
                     <Share2 className="w-5 h-5" />
-                 </button>
-                 <button className="w-10 h-10 rounded-full glass border border-white/10 flex items-center justify-center text-white/60 hover:text-white transition-all">
-                    <Settings className="w-5 h-5" />
                  </button>
               </div>
             </div>
@@ -417,21 +276,21 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ fullPage = false, movie: prop
             {/* Center Controls */}
             <div className="flex items-center justify-center gap-8 md:gap-24">
                <button 
-                 onClick={() => skip(-10)}
+                 onClick={(e) => { e.stopPropagation(); skip(-10); }}
                  className="w-12 h-12 md:w-16 md:h-16 rounded-full glass border border-white/5 flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-all group"
                >
                  <RotateCcw className="w-6 h-6 md:w-8 md:h-8 group-hover:-rotate-12 transition-transform" />
                </button>
                
                <button 
-                 onClick={togglePlay}
+                 onClick={(e) => { e.stopPropagation(); togglePlay(); }}
                  className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-[#E50914] flex items-center justify-center text-white shadow-[0_0_30px_rgba(229,9,20,0.4)] hover:scale-110 active:scale-95 transition-all"
                >
                  {isPlaying ? <Pause className="w-8 h-8 md:w-10 md:h-10 fill-current" /> : <Play className="w-8 h-8 md:w-10 md:h-10 fill-current translate-x-1" />}
                </button>
 
                <button 
-                 onClick={() => skip(10)}
+                 onClick={(e) => { e.stopPropagation(); skip(10); }}
                  className="w-12 h-12 md:w-16 md:h-16 rounded-full glass border border-white/5 flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-all group"
                >
                  <RotateCw className="w-6 h-6 md:w-8 md:h-8 group-hover:rotate-12 transition-transform" />
@@ -492,16 +351,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ fullPage = false, movie: prop
                           </div>
                        </div>
                        
-                       <div className="flex items-center gap-2 md:gap-4">
-                          {[1,2,3,4,5].map(star => (
-                              <button 
-                                key={star}
-                                onClick={() => handleRating(star)}
-                                className={`transition-all hover:scale-125 ${star <= rating ? 'text-[#E50914]' : 'text-white/20'}`}
-                              >
-                                <Star className={`w-4 h-4 md:w-5 md:h-5 ${star <= rating ? 'fill-current' : ''}`} />
-                              </button>
-                          ))}
+                       <div className="flex items-center gap-2 md:gap-4 invisible">
+                          {/* Rating removed from player UI as requested */}
                        </div>
                     </div>
 
@@ -522,100 +373,22 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ fullPage = false, movie: prop
         )}
       </AnimatePresence>
 
-      {/* Social Panel (Side Drawer) */}
-      <AnimatePresence>
-         {showSocial && (
-            <motion.div 
-               initial={{ x: '100%' }}
-               animate={{ x: 0 }}
-               exit={{ x: '100%' }}
-               className="absolute top-0 right-0 h-full w-full md:w-[450px] bg-black/95 backdrop-blur-3xl z-50 border-l border-white/10 shadow-3xl flex flex-col"
-            >
-               <div className="p-8 border-b border-white/5 flex items-center justify-between bg-zinc-900/40">
-                  <div className="flex flex-col">
-                     <span className="text-[#E50914] text-[10px] font-black uppercase tracking-[0.4em] mb-1">Community</span>
-                     <h3 className="text-2xl font-black text-white uppercase tracking-tighter">Real-time Echo</h3>
-                  </div>
-                  <button onClick={() => setShowSocial(false)} className="w-10 h-10 rounded-full flex items-center justify-center glass hover:bg-white/10">
-                     <X className="w-5 h-5 text-white" />
-                  </button>
-               </div>
-
-               <div className="flex-1 overflow-y-auto p-6 space-y-6">
-                  {comments.length > 0 ? (
-                      comments.map((c, i) => (
-                        <motion.div 
-                            key={c.id} 
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: i * 0.05 }}
-                            className="flex gap-4 p-4 rounded-3xl bg-white/5 border border-white/5"
-                        >
-                            <div className="w-10 h-10 rounded-full overflow-hidden border border-white/10 flex-shrink-0">
-                               <img src={c.profiles?.avatar_url || maleDefault} alt="" className="w-full h-full object-cover" />
-                            </div>
-                            <div className="flex-1 space-y-2">
-                               <div className="flex items-center justify-between">
-                                  <span className="text-[10px] font-black text-[#E50914] uppercase tracking-widest">{c.profiles?.username}</span>
-                                  <span className="text-[8px] font-bold text-gray-700 uppercase">{new Date(c.created_at).toLocaleDateString()}</span>
-                                </div>
-                               <p className="text-gray-300 text-[11px] font-bold leading-relaxed">{c.content}</p>
-                               <button className="flex items-center gap-1.5 text-[8px] font-black text-gray-700 uppercase tracking-widest hover:text-[#E50914] transition-colors">
-                                  <ThumbsUp className="w-3 h-3" />
-                                  Upvote
-                                </button>
-                            </div>
-                        </motion.div>
-                      ))
-                  ) : (
-                      <div className="h-full flex flex-col items-center justify-center text-center p-12 space-y-6 grayscale opacity-30">
-                         <MessageSquare className="w-16 h-16 text-white" />
-                         <p className="text-[10px] font-black text-white uppercase tracking-[0.4em]">No echos yet. Start the conversation.</p>
-                      </div>
-                  )}
-               </div>
-
-               <div className="p-6 bg-zinc-900/60 border-t border-white/5">
-                  <form onSubmit={handleComment} className="relative">
-                     <input 
-                        type="text" 
-                        value={comment}
-                        onChange={(e) => setComment(e.target.value)}
-                        placeholder="ADD AN ECHO..."
-                        className="w-full bg-black/50 p-6 pr-16 rounded-full outline-none border border-white/10 focus:border-[#E50914]/50 font-black text-[10px] text-white placeholder:text-gray-800 uppercase tracking-widest"
-                     />
-                     <button className="absolute right-2 top-2 w-12 h-12 rounded-full bg-[#E50914] flex items-center justify-center text-white shadow-xl hover:scale-105 active:scale-95 transition-all">
-                        <Send className="w-5 h-5" />
-                     </button>
-                  </form>
-               </div>
-            </motion.div>
-         )}
-      </AnimatePresence>
-
       {/* Movie Details Toast (Fades out) */}
       <AnimatePresence>
-        {!isPlaying && showControls && !showSocial && (
+        {!isPlaying && showControls && (
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="absolute bottom-32 left-6 md:left-10 z-[5] max-w-sm md:max-w-lg"
+            className="absolute bottom-32 left-6 z-[5] max-w-[240px] md:max-w-xs"
           >
-            <div className="bg-black/60 backdrop-blur-3xl p-6 md:p-8 rounded-3xl border border-white/10 shadow-3xl relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-1 h-full bg-[#E50914] shadow-[0_0_20px_rgba(229,9,20,0.5)]" />
-                <div className="flex items-center gap-3 mb-4">
-                  <span className="bg-[#DAA520] text-white text-[9px] font-black px-3 py-1 rounded-sm uppercase tracking-widest shadow-[0_0_15px_rgba(218,165,32,0.3)]">Filamu Original</span>
-                  <span className="text-gray-500 text-[10px] font-black uppercase tracking-widest">{selectedMovie.releaseYear}</span>
+            <div className="bg-black/40 backdrop-blur-2xl p-4 rounded-2xl border border-white/5 shadow-2xl relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-primary text-[7px] font-black uppercase tracking-widest">Filamu Original</span>
                 </div>
-                <h2 className="text-3xl md:text-4xl font-black tracking-tighter uppercase text-white mb-4 leading-none">{selectedMovie.title}</h2>
-                <p className="text-gray-400 text-[10px] md:text-sm font-bold uppercase tracking-widest leading-relaxed line-clamp-3">{selectedMovie.description}</p>
-                <div className="flex items-center gap-4 mt-8">
-                   <div className="flex items-center gap-2">
-                       <Star className="w-4 h-4 text-[#E50914] fill-current" />
-                       <span className="text-white text-[10px] font-black tracking-widest">{rating || selectedMovie.rating || 'NR'}</span>
-                   </div>
-                </div>
+                <h2 className="text-sm md:text-base font-black tracking-tight uppercase text-white mb-1 leading-none">{selectedMovie.title}</h2>
+                <p className="text-zinc-500 text-[8px] font-bold uppercase tracking-wider leading-normal line-clamp-2">{selectedMovie.description}</p>
             </div>
           </motion.div>
         )}

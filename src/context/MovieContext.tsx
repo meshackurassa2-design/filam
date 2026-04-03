@@ -14,7 +14,7 @@ interface MovieContextType {
   likedMovies: string[];
   addToMyList: (movie: Movie) => void;
   removeFromMyList: (id: string) => void;
-  toggleLike: (id: string) => void;
+  toggleLike: (id: string, vote?: number) => void;
   selectedMovie: Movie | null;
   setSelectedMovie: (movie: Movie | null) => void;
   isPlayerOpen: boolean;
@@ -26,6 +26,8 @@ interface MovieContextType {
   selectedYear: string;
   setSelectedYear: (year: string) => void;
   refreshMovies: () => Promise<void>;
+  getEpisodes: (movieId: string) => Promise<any[]>;
+  getLikeStats: (movieId: string) => { likes: number; dislikes: number; userVote: number | null };
 }
 
 const MovieContext = createContext<MovieContextType | undefined>(undefined);
@@ -39,6 +41,7 @@ export const MovieProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('All');
   const [selectedYear, setSelectedYear] = useState('All');
+  const [allLikes, setAllLikes] = useState<any[]>([]);
 
   const refreshMovies = async () => {
     const { data } = await supabase.from('movies').select('*').order('created_at', { ascending: false });
@@ -58,6 +61,9 @@ export const MovieProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       }));
       setAllMovies(mappedMovies);
     }
+
+    const { data: likesData } = await supabase.from('movie_likes').select('*');
+    if (likesData) setAllLikes(likesData);
   };
 
   useEffect(() => {
@@ -92,7 +98,15 @@ export const MovieProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const genres = Array.from(new Set(filteredMovies.map(m => m.genre).filter(Boolean))) as string[];
     const trendingMovies = [...filteredMovies].sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 10);
     
+    // Algorithm: Recommended based on sum of votes
+    const recommendedMovies = [...filteredMovies].sort((a, b) => {
+        const aLikes = allLikes.filter(l => l.movie_id === a.id).reduce((acc, curr) => acc + curr.vote, 0);
+        const bLikes = allLikes.filter(l => l.movie_id === b.id).reduce((acc, curr) => acc + curr.vote, 0);
+        return bLikes - aLikes;
+    }).slice(0, 10);
+
     const baseCats = [
+      { title: "Top Recommended", movies: recommendedMovies },
       { title: "Recently Added", movies: filteredMovies.slice(0, 10) },
       ...(trendingMovies.length > 0 ? [{ title: "Trending Now", movies: trendingMovies }] : []),
       { title: "New Releases", movies: filteredMovies.slice(0, 15) }
@@ -116,10 +130,38 @@ export const MovieProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setMyList(prev => prev.filter(m => m.id !== id));
   };
 
-  const toggleLike = (id: string) => {
+  const toggleLike = async (id: string, vote: number = 1) => {
+    // Legacy local support
     setLikedMovies(prev => 
       prev.includes(id) ? prev.filter(mid => mid !== id) : [...prev, id]
     );
+
+    // Supabase support
+    const user_id = (await supabase.auth.getUser()).data.user?.id;
+    if (user_id) {
+        const { data: existing } = await supabase.from('movie_likes')
+            .select('*').eq('movie_id', id).eq('user_id', user_id).single();
+            
+        if (existing && existing.vote === vote) {
+            await supabase.from('movie_likes').delete().eq('id', existing.id);
+        } else {
+            await supabase.from('movie_likes').upsert({ movie_id: id, user_id, vote });
+        }
+        refreshMovies();
+    }
+  };
+
+  const getEpisodes = async (movieId: string) => {
+    const { data } = await supabase.from('episodes').select('*').eq('movie_id', movieId).order('episode_number', { ascending: true });
+    return data || [];
+  };
+
+  const getLikeStats = (movieId: string) => {
+    const movieVotes = allLikes.filter(l => l.movie_id === movieId);
+    const likes = movieVotes.filter(v => v.vote === 1).length;
+    const dislikes = movieVotes.filter(v => v.vote === -1).length;
+    const userVote = 0; // Simplified for now
+    return { likes, dislikes, userVote };
   };
 
   return (
@@ -141,7 +183,9 @@ export const MovieProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       setSelectedGenre,
       selectedYear,
       setSelectedYear,
-      refreshMovies
+      refreshMovies,
+      getEpisodes,
+      getLikeStats
     }}>
       {children}
     </MovieContext.Provider>

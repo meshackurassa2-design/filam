@@ -310,16 +310,16 @@ const Admin: React.FC = () => {
       <div className="pt-24 px-[4%] md:px-[6%] max-w-[1400px] mx-auto">
         <header className="flex flex-col md:flex-row items-center justify-between mb-16 gap-6 relative">
             <div className="flex flex-col text-center md:text-left">
-                <span className="text-[#E50914] text-[10px] font-black uppercase tracking-[0.4em] mb-2">Systems Management</span>
+                <span className="text-[#FFB800] text-[10px] font-black uppercase tracking-[0.4em] mb-2">Systems Management</span>
                 <div className="flex items-center gap-6">
                     <h1 className="text-5xl md:text-7xl font-black text-white tracking-tighter uppercase">
-                        ADMIN <span className="text-[#E50914]">CORE</span>
+                        ADMIN <span className="text-[#FFB800]">CORE</span>
                     </h1>
                     <div className="flex items-center gap-4">
                         <button 
                             onClick={() => setShowUploadForm(!showUploadForm)}
                             className={`w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center transition-all duration-500 shadow-2xl ${
-                                showUploadForm ? 'bg-white text-black rotate-45' : 'bg-[#E50914] text-white hover:scale-110'
+                                showUploadForm ? 'bg-white text-black rotate-45' : 'bg-[#FFB800] text-white hover:scale-110'
                             }`}
                         >
                             <Plus className="w-6 h-6 md:w-8 md:h-8" />
@@ -332,7 +332,7 @@ const Admin: React.FC = () => {
                         <button 
                             onClick={() => setShowGenreManager(!showGenreManager)}
                             className={`w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center transition-all border border-white/10 hover:bg-white/5 ${
-                                showGenreManager ? 'bg-[#E50914] text-white border-transparent' : 'text-gray-500'
+                                showGenreManager ? 'bg-[#FFB800] text-white border-transparent' : 'text-gray-500'
                             }`}
                         >
                             <Settings className="w-5 h-5 md:w-6 md:h-6" />
@@ -371,7 +371,7 @@ const Admin: React.FC = () => {
                         'bg-black/95 border-white/10'
                     }`}>
                         <div className="flex items-center gap-4">
-                            {uploading ? <Loader2 className="w-6 h-6 animate-spin text-[#E50914]" /> : status.type === 'error' ? <FileVideo className="text-red-500" /> : <Plus className="text-green-500" />}
+                            {uploading ? <Loader2 className="w-6 h-6 animate-spin text-[#FFB800]" /> : status.type === 'error' ? <FileVideo className="text-red-500" /> : <Plus className="text-green-500" />}
                             <span className="text-sm font-black uppercase tracking-[0.5em] text-white">
                                 {status.text}
                             </span>
@@ -382,7 +382,7 @@ const Admin: React.FC = () => {
                                 <div className="text-[6rem] font-black text-white text-center tracking-tighter leading-none shadow-text">{progress}%</div>
                                 <div className="h-[2px] w-full bg-white/5 rounded-full overflow-hidden">
                                     <motion.div 
-                                        className="h-full bg-[#E50914] shadow-[0_0_20px_#E50914]" 
+                                        className="h-full bg-[#FFB800] shadow-[0_0_20px_#FFB800]" 
                                         animate={{ width: `${progress}%` }} 
                                         transition={{ duration: 0.3 }}
                                     />
@@ -448,15 +448,15 @@ const Admin: React.FC = () => {
                 >
                     <div className="bg-zinc-900/40 backdrop-blur-3xl rounded-[2.5rem] p-8 md:p-12 border border-white/5">
                         <h3 className="text-2xl font-black text-white uppercase tracking-tighter mb-8 flex items-center gap-3">
-                            <Settings className="w-6 h-6 text-[#E50914]" /> Dynamic Genres
+                            <Settings className="w-6 h-6 text-[#FFB800]" /> Dynamic Genres
                         </h3>
                         <form onSubmit={handleGenreAdd} className="flex gap-4 mb-8">
                             <input type="text" placeholder="NEW CATEGORY..." className="flex-1 bg-black/40 p-6 rounded-2xl border border-white/5 text-white font-black uppercase" value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} />
-                            <button type="submit" disabled={isCategoryLoading} className="px-8 rounded-2xl bg-[#E50914] text-white font-black text-[10px] uppercase tracking-widest">Add</button>
+                            <button type="submit" disabled={isCategoryLoading} className="px-8 rounded-2xl bg-[#FFB800] text-white font-black text-[10px] uppercase tracking-widest">Add</button>
                         </form>
                         <div className="flex flex-wrap gap-3">
                             {categories.map(cat => (
-                                <div key={cat.id} className="group relative px-6 py-3 rounded-xl bg-white/5 border border-white/5 hover:border-[#E50914]/50 transition-all flex items-center gap-3">
+                                <div key={cat.id} className="group relative px-6 py-3 rounded-xl bg-white/5 border border-white/5 hover:border-[#FFB800]/50 transition-all flex items-center gap-3">
                                     <span className="text-white font-black uppercase tracking-widest text-[9px]">{cat.name}</span>
                                     <button onClick={() => handleGenreDelete(cat.id, cat.name)} className="text-gray-700 hover:text-red-500 transition-colors"><X className="w-3 h-3" /></button>
                                 </div>
@@ -476,7 +476,7 @@ const Admin: React.FC = () => {
                 >
                     <form onSubmit={handleUploadOrUpdate} className="grid lg:grid-cols-[1fr_400px] gap-12">
                         <div className="bg-zinc-900/40 backdrop-blur-3xl rounded-[2.5rem] p-8 md:p-12 border border-white/5 relative">
-                            <div className="absolute top-0 left-0 w-1 h-full bg-[#E50914]" />
+                            <div className="absolute top-0 left-0 w-1 h-full bg-[#FFB800]" />
                             <div className="flex items-center justify-between mb-10">
                                 <h3 className="text-2xl font-black text-white uppercase tracking-tighter">{editingMovie ? 'Sync Original' : 'Initiate Original'}</h3>
                                 <button type="button" onClick={resetForm} className="text-gray-500 hover:text-white transition-all"><X className="w-6 h-6" /></button>
@@ -498,13 +498,13 @@ const Admin: React.FC = () => {
                         </div>
                         <div className="bg-zinc-900/40 backdrop-blur-3xl rounded-[2.5rem] p-8 border border-white/5 flex flex-col justify-between">
                             <div className="space-y-6">
-                                <div className="group relative h-32 rounded-2xl border-2 border-dashed border-white/10 hover:border-[#E50914]/50 flex flex-col items-center justify-center p-4 cursor-pointer overflow-hidden">
+                                <div className="group relative h-32 rounded-2xl border-2 border-dashed border-white/10 hover:border-[#FFB800]/50 flex flex-col items-center justify-center p-4 cursor-pointer overflow-hidden">
                                     <input type="file" className="absolute inset-0 opacity-0 cursor-pointer z-10" accept="image/*" onChange={(e) => setPoster(e.target.files?.[0] || null)} />
                                     {poster ? <CheckCircle2 className="text-green-500" /> : <p className="text-[10px] font-black text-gray-700 uppercase">Poster Source</p>}
                                 </div>
-                                <div className="group relative h-40 rounded-2xl border-2 border-dashed border-white/10 hover:border-[#E50914]/50 flex flex-col items-center justify-center p-4 cursor-pointer">
+                                <div className="group relative h-40 rounded-2xl border-2 border-dashed border-white/10 hover:border-[#FFB800]/50 flex flex-col items-center justify-center p-4 cursor-pointer">
                                     <input type="file" className="absolute inset-0 opacity-0 cursor-pointer z-10" accept="video/*" onChange={(e) => setVideo(e.target.files?.[0] || null)} />
-                                    {video ? <FileVideo className="text-[#E50914]" /> : <p className="text-[10px] font-black text-gray-700 uppercase">Video Source</p>}
+                                    {video ? <FileVideo className="text-[#FFB800]" /> : <p className="text-[10px] font-black text-gray-700 uppercase">Video Source</p>}
                                 </div>
                             </div>
                             <div className="mt-10">
@@ -512,17 +512,17 @@ const Admin: React.FC = () => {
                                     <div className="space-y-3">
                                         <div className="h-2 bg-white/5 rounded-full overflow-hidden relative">
                                             <motion.div 
-                                                className="h-full bg-[#E50914] shadow-[0_0_15px_rgba(229,9,20,0.5)]" 
+                                                className="h-full bg-[#FFB800] shadow-[0_0_15px_rgba(229,9,20,0.5)]" 
                                                 animate={{ width: `${progress}%` }} 
                                             />
                                         </div>
                                         <div className="flex justify-between items-center px-1">
-                                            <span className="text-[10px] font-black text-[#E50914] animate-pulse">SYNCING...</span>
+                                            <span className="text-[10px] font-black text-[#FFB800] animate-pulse">SYNCING...</span>
                                             <span className="text-[10px] font-black text-white">{progress}%</span>
                                         </div>
                                     </div>
                                 ) : (
-                                    <button type="submit" className="w-full py-5 rounded-2xl bg-[#E50914] text-white font-black uppercase tracking-widest">{editingMovie ? 'Sync Update' : 'Publish Original'}</button>
+                                    <button type="submit" className="w-full py-5 rounded-2xl bg-[#FFB800] text-white font-black uppercase tracking-widest">{editingMovie ? 'Sync Update' : 'Publish Original'}</button>
                                 )}
                             </div>
                         </div>
@@ -537,14 +537,14 @@ const Admin: React.FC = () => {
                     className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
                 >
                     {allMovies.map((movie: any) => (
-                        <motion.div key={movie.id} layout className="group bg-zinc-900/40 rounded-[1.5rem] border border-white/5 overflow-hidden flex flex-col hover:border-[#E50914]/30 transition-all duration-500">
+                        <motion.div key={movie.id} layout className="group bg-zinc-900/40 rounded-[1.5rem] border border-white/5 overflow-hidden flex flex-col hover:border-[#FFB800]/30 transition-all duration-500">
                             <div className="relative aspect-video overflow-hidden">
                                 <img src={movie.image} alt={movie.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                                 <div className="absolute top-4 right-4 px-4 py-1.5 rounded-full bg-black/60 border border-white/10 text-[8px] font-black text-white uppercase tracking-widest">{movie.type}</div>
                             </div>
                             <div className="p-8 flex-1 flex flex-col justify-between gap-6">
                                 <div>
-                                    <h3 className="text-xl font-black text-white uppercase tracking-tighter mb-2 truncate group-hover:text-[#E50914] transition-colors">{movie.title}</h3>
+                                    <h3 className="text-xl font-black text-white uppercase tracking-tighter mb-2 truncate group-hover:text-[#FFB800] transition-colors">{movie.title}</h3>
                                     <p className="text-gray-600 text-[10px] font-black uppercase tracking-widest">{movie.category || movie.genre} • {movie.release_year || movie.releaseYear}</p>
                                 </div>
                                 <div className="flex items-center gap-3">
@@ -567,7 +567,7 @@ const Admin: React.FC = () => {
                             <p className="text-gray-600 text-[10px] font-black uppercase tracking-[0.4em] mb-10">No localized FILAMU Originals found.</p>
                             <button 
                                 onClick={() => setShowUploadForm(true)}
-                                className="px-10 py-5 rounded-full bg-[#E50914] text-white text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-[0_10px_30px_rgba(229,9,20,0.3)]"
+                                className="px-10 py-5 rounded-full bg-[#FFB800] text-white text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-[0_10px_30px_rgba(229,9,20,0.3)]"
                             >
                                 Add Your First Original
                             </button>

@@ -24,9 +24,9 @@ const TVShows: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="mb-16"
         >
-          <div className="w-12 h-1 bg-[#E50914] shadow-[0_0_15px_rgba(229,9,20,0.5)] mb-6" />
+          <div className="w-12 h-1 bg-primary shadow-[0_0_15px_rgba(255,184,0,0.5)] mb-6" />
           <h1 className="text-white text-5xl md:text-7xl font-black tracking-tighter leading-none mb-6 uppercase">
-            TV SHOW <span className="text-[#E50914]">ORIGINALS</span>
+            TV SHOW <span className="text-primary">ORIGINALS</span>
           </h1>
           <p className="text-gray-500 max-w-2xl font-black uppercase tracking-widest text-xs leading-relaxed">
             Immerse yourself in gripping series and epic storylines, remastered for the original experience.

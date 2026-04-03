@@ -1,5 +1,6 @@
 import React from 'react';
 import Hero from '../components/Hero.tsx';
+import HeaderTabs from '../components/HeaderTabs.tsx';
 import Row from '../components/Row.tsx';
 import { useMovies } from '../context/MovieContext.tsx';
 
@@ -10,7 +11,10 @@ const Home: React.FC = () => {
   } = useMovies();
 
   return (
-    <div className="bg-black min-h-screen">
+    <div className="bg-black min-h-screen pt-24">
+      {/* Top Level Category Tabs */}
+      <HeaderTabs />
+
       {/* Cinematic Hero Section */}
       <Hero />
 

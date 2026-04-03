@@ -123,7 +123,7 @@ const Account: React.FC = () => {
                      <div className="relative group mb-4">
                         <div className="w-28 h-28 rounded-md overflow-hidden border-2 border-white/10 group-hover:border-white transition-all shadow-2xl">
                             <img src={getProfileImage()} alt="Me" className={`w-full h-full object-cover ${uploading ? 'opacity-30' : ''}`} />
-                            {uploading && <div className="absolute inset-0 flex items-center justify-center"><div className="w-6 h-6 border-2 border-[#E50914] border-t-transparent rounded-full animate-spin" /></div>}
+                            {uploading && <div className="absolute inset-0 flex items-center justify-center"><div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>}
                         </div>
                         <label className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-white text-black flex items-center justify-center cursor-pointer shadow-xl hover:scale-110 active:scale-95 transition-all">
                             <Camera className="w-4 h-4" />
@@ -134,7 +134,7 @@ const Account: React.FC = () => {
                     <p className="text-zinc-500 font-bold text-[10px] tracking-widest uppercase">{user?.email}</p>
                     
                     {isAdmin && (
-                        <div className="mt-4 px-3 py-1 bg-[#E50914] text-white text-[8px] font-black uppercase tracking-widest rounded-full shadow-[0_0_15px_rgba(229,9,20,0.4)] flex items-center gap-2">
+                        <div className="mt-4 px-3 py-1 bg-primary text-black text-[8px] font-black uppercase tracking-widest rounded-full shadow-[0_0_15px_rgba(255,184,0,0.4)] flex items-center gap-2">
                             <ShieldCheck className="w-3 h-3" /> NETWORK ADMIN
                         </div>
                     )}
@@ -149,7 +149,7 @@ const Account: React.FC = () => {
                         className="w-full flex items-center justify-between px-6 py-5 bg-zinc-900/40 hover:bg-zinc-900/80 transition-all border-y border-white/5"
                     >
                         <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-lg bg-[#E50914]/10 flex items-center justify-center text-[#E50914]">
+                            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                                 <ShieldCheck className="w-5 h-5" />
                             </div>
                             <div className="text-left">
@@ -157,7 +157,7 @@ const Account: React.FC = () => {
                                 <span className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Update your biometric/password key</span>
                             </div>
                         </div>
-                        <SettingsIcon className={`w-4 h-4 text-zinc-600 transition-transform ${showKeyForm ? 'rotate-90 text-[#E50914]' : ''}`} />
+                        <SettingsIcon className={`w-4 h-4 text-zinc-600 transition-transform ${showKeyForm ? 'rotate-90 text-primary' : ''}`} />
                     </button>
 
                     <AnimatePresence>
@@ -173,11 +173,11 @@ const Account: React.FC = () => {
                                     <input 
                                         type="password" 
                                         placeholder="NEW SECURITY KEY"
-                                        className="flex-1 bg-black p-4 rounded-lg border border-white/10 text-white font-black text-[10px] uppercase outline-none focus:border-[#E50914]/50"
+                                        className="flex-1 bg-black p-4 rounded-lg border border-white/10 text-white font-black text-[10px] uppercase outline-none focus:border-primary/50"
                                         value={newPassword}
                                         onChange={(e) => setNewPassword(e.target.value)}
                                     />
-                                    <button className="px-6 rounded-lg bg-[#E50914] text-white font-black text-[10px] uppercase tracking-widest active:scale-95 transition-all">
+                                    <button className="px-6 rounded-lg bg-primary text-black font-black text-[10px] uppercase tracking-widest active:scale-95 transition-all">
                                         Update
                                     </button>
                                 </div>
@@ -232,7 +232,7 @@ const Account: React.FC = () => {
                     <div className="mt-12 px-6">
                         <button 
                             onClick={handleSignOut}
-                            className="w-full py-5 rounded-xl bg-zinc-900 text-zinc-400 font-black text-[10px] uppercase tracking-[0.5em] hover:bg-[#E50914] hover:text-white transition-all shadow-xl"
+                            className="w-full py-5 rounded-xl bg-zinc-900 text-zinc-400 font-black text-[10px] uppercase tracking-[0.5em] hover:bg-primary hover:text-black transition-all shadow-xl"
                         >
                             <LogOut className="w-4 h-4 mr-2 inline" />
                             Log Out from Network
