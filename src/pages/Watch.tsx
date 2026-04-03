@@ -37,7 +37,7 @@ const Watch: React.FC = () => {
   return (
     <div className="min-h-screen bg-black text-white pb-32 font-sans overflow-x-hidden">
       {/* 1. Full-Screen Backdrop / Video Section */}
-      <div className="relative w-full aspect-[3/4] md:aspect-video bg-zinc-900 overflow-hidden">
+      <div className={`relative w-full ${!isPlayerOpen ? 'h-[60vh] md:h-[70vh] rounded-b-[40px]' : 'aspect-video'} bg-black overflow-hidden transition-all duration-500`}>
         <AnimatePresence mode="wait">
             {!isPlayerOpen ? (
                 <motion.div 
@@ -87,7 +87,7 @@ const Watch: React.FC = () => {
       <motion.div 
         initial={{ y: 200, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="relative z-20 -mt-24 px-6 mb-10"
+        className={`relative z-20 px-4 md:px-6 mb-10 transition-all duration-500 ${!isPlayerOpen ? '-mt-32' : 'mt-6'}`}
       >
         <div className="w-full bg-[#111112]/95 backdrop-blur-3xl rounded-[40px] border border-white/5 p-10 pt-12 shadow-[0_-30px_100px_rgba(0,0,0,1)]">
             
