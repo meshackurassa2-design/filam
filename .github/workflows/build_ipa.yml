@@ -1,0 +1,58 @@
+name: Build Unsigned IPA
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Build Web Project
+        run: npm run build
+
+      - name: Sync Capacitor iOS
+        run: |
+          npx cap add ios || true
+          npx cap sync ios
+
+      - name: Build iOS App (Unsigned)
+        run: |
+          cd ios/App
+          xcodebuild -workspace App.xcworkspace \
+                     -scheme App \
+                     -configuration Debug \
+                     -sdk iphoneos \
+                     -derivedDataPath build \
+                     CODE_SIGNING_ALLOWED=NO \
+                     CODE_SIGN_IDENTITY="" \
+                     CODE_SIGNING_REQUIRED=NO \
+                     clean build
+
+      - name: Create IPA (Unsigned)
+        run: |
+          mkdir -p Payload
+          # Find the .app in the derived data
+          APP_PATH=$(find ios/App/build -name "*.app" | head -n 1)
+          cp -r "$APP_PATH" Payload/
+          zip -r FilamuTimes_Premium.ipa Payload
+          
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FilamuTimes_Premium_Unsigned_IPA
+          path: FilamuTimes_Premium.ipa
+          retention-days: 7

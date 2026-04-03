@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.filamutimes.app',
-  appName: 'Filamu Times',
+  appName: 'Filamu Times Premium',
   webDir: 'dist',
   plugins: {
     SplashScreen: {
