@@ -16,7 +16,8 @@ const config: CapacitorConfig = {
     },
   },
   server: {
-    androidScheme: 'https'
+    androidScheme: 'https',
+    iosScheme: 'https'
   }
 };
 
