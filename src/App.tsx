@@ -14,7 +14,6 @@ import Admin from './pages/Admin.tsx';
 import Watch from './pages/Watch.tsx';
 import Search from './pages/Search.tsx';
 import Trending from './pages/Trending.tsx';
-import SplashScreen from './components/SplashScreen.tsx';
 import BottomNav from './components/BottomNav.tsx';
 import Navbar from './components/Navbar.tsx';
 import MobileHeader from './components/MobileHeader.tsx';
