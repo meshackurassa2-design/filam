@@ -42,7 +42,7 @@ const BottomNav: React.FC = () => {
     });
 
     return (
-        <div className="fixed bottom-0 inset-x-0 z-[6000] flex justify-center px-4 pb-12 pointer-events-none">
+        <div className="fixed bottom-0 inset-x-0 z-[6000] flex justify-center px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pointer-events-none">
             <div className="relative w-full max-w-sm pointer-events-auto group">
                 <div className="absolute inset-0 bg-black/40 backdrop-blur-2xl rounded-[40px] border border-white/10 -z-10" />
                 {/* Custom SVG Tab Bar with "Dip" */}

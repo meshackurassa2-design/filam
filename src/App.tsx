@@ -100,39 +100,43 @@ const App: React.FC = () => {
     return (
         <AuthProvider>
             <MovieProvider>
-                {showSplash ? (
-                   <SplashScreen onFinish={() => setShowSplash(false)} />
-                ) : (
-                   <Router>
-                        <BackButtonHandler />
-                        <StatusBarHandler />
-                        <Navbar />
-                        <MobileHeader />
-                        <div className="flex flex-col min-h-screen border-t-[0px] border-transparent pt-0">
-                            <main className="flex-grow">
-                                <Routes>
-                                    <Route path="/login" element={<Login />} />
-                                    <Route path="/signup" element={<SignUp />} />
-
-                                    {/* Protected Routes */}
-                                    <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-                                    <Route path="/movies" element={<ProtectedRoute><Movies /></ProtectedRoute>} />
-                                    <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
-                                    <Route path="/profiles" element={<ProtectedRoute><Profiles /></ProtectedRoute>} />
-                                    <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
-                                    <Route path="/watch/:id" element={<ProtectedRoute><Watch /></ProtectedRoute>} />
-                                    <Route path="/trending" element={<ProtectedRoute><Trending /></ProtectedRoute>} />
-                                    
-                                    {/* Admin Route */}
-                                    <Route path="/admin" element={<ProtectedRoute requireAdmin><Admin /></ProtectedRoute>} />
-
-                                    <Route path="*" element={<Navigate to="/" replace />} />
-                                </Routes>
-                            </main>
-                            <BottomNav />
+                <Router>
+                    <BackButtonHandler />
+                    <StatusBarHandler />
+                    
+                    {/* Splash Overlay */}
+                    {showSplash && (
+                        <div className="fixed inset-0 z-[9999] pointer-events-auto">
+                            <SplashScreen onFinish={() => setShowSplash(false)} />
                         </div>
-                    </Router>
-                 )}
+                    )}
+
+                    <Navbar />
+                    <MobileHeader />
+                    <div className="flex flex-col min-h-screen border-t-[0px] border-transparent pt-0">
+                        <main className="flex-grow">
+                            <Routes>
+                                <Route path="/login" element={<Login />} />
+                                <Route path="/signup" element={<SignUp />} />
+
+                                {/* Protected Routes */}
+                                <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+                                <Route path="/movies" element={<ProtectedRoute><Movies /></ProtectedRoute>} />
+                                <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
+                                <Route path="/profiles" element={<ProtectedRoute><Profiles /></ProtectedRoute>} />
+                                <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
+                                <Route path="/watch/:id" element={<ProtectedRoute><Watch /></ProtectedRoute>} />
+                                <Route path="/trending" element={<ProtectedRoute><Trending /></ProtectedRoute>} />
+                                
+                                {/* Admin Route */}
+                                <Route path="/admin" element={<ProtectedRoute requireAdmin><Admin /></ProtectedRoute>} />
+
+                                <Route path="*" element={<Navigate to="/" replace />} />
+                            </Routes>
+                        </main>
+                        <BottomNav />
+                    </div>
+                </Router>
             </MovieProvider>
         </AuthProvider>
     );
