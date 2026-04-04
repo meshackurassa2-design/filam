@@ -73,15 +73,7 @@ const StatusBarHandler = () => {
 };
 
 const App: React.FC = () => {
-    const [showSplash, setShowSplash] = React.useState(() => {
-        return !sessionStorage.getItem('filamu_splash_shown');
-    });
-
     useEffect(() => {
-        if (showSplash) {
-            sessionStorage.setItem('filamu_splash_shown', 'true');
-        }
-        
         // Global Immersive Mode (Fullscreen)
         const hideSystemUI = async () => {
             if (Capacitor.isNativePlatform()) {
@@ -95,7 +87,7 @@ const App: React.FC = () => {
         };
         
         hideSystemUI();
-    }, [showSplash]);
+    }, []);
 
     return (
         <AuthProvider>
@@ -104,13 +96,6 @@ const App: React.FC = () => {
                     <BackButtonHandler />
                     <StatusBarHandler />
                     
-                    {/* Splash Overlay */}
-                    {showSplash && (
-                        <div className="fixed inset-0 z-[9999] pointer-events-auto">
-                            <SplashScreen onFinish={() => setShowSplash(false)} />
-                        </div>
-                    )}
-
                     <Navbar />
                     <MobileHeader />
                     <div className="flex flex-col min-h-screen border-t-[0px] border-transparent pt-0">

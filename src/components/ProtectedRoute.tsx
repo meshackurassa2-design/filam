@@ -6,7 +6,7 @@ export const ProtectedRoute: React.FC<{ children: React.ReactNode; requireAdmin?
   const { user, isAdmin, loading } = useAuth();
 
   if (loading) {
-    return <div className="min-h-screen bg-[#141414] text-white flex items-center justify-center">Loading...</div>;
+    return <div className="min-h-screen bg-black" />;
   }
 
   if (!user) {
